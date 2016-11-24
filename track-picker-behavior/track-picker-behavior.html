@@ -1,0 +1,178 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<script>
+  /**
+
+## Polymer.TrackPickerBehavior
+
+A Polymer behavior to detect the track / tap on pickable element and notify the active target.
+
+### How does it work
+
+The picking begins when the user click or touch an element that contains the class defined by `_pickableClass` attribute. It is stored in `_lastActiveTarget` and updated as the cursor moves from an element to another. The picking stops when the user releases the cursor.
+
+- `touchPickDelay` - in ms, default to 500 - allows the picking to start after the user stay a while on the same target. 
+- `touchPickMaxYTremor` prevents begin picking when the track starts vertically.
+
+   * @demo track-picker-behavior/demo/index.html
+   * @polymerBehavior Polymer.TrackPickerBehavior
+   */
+  Polymer.TrackPickerBehavior = {
+  	
+  	properties: {
+      /**
+       * True when the user is currently picking.
+       */
+      picking: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        readOnly: true,
+        observer: '_pickingChanged'
+      },
+      /**
+       * When true, user's picking actions aren't listen anymore.
+       */
+      pickDisabled: {
+        type: Boolean,
+        value: false,
+        observer: '_pickDisabledChanged'
+      },
+      /**
+       * Delay the touch screen user has to wait on the same target to start picking. Convenient to avoid conflict with scroll behavior.
+       */
+      touchPickDelay: {
+        type: Number,
+        value: 500
+      },
+      /**
+       * Maximum allowed Y move (in px) when track start, in order to prevents picking when the track starts vertically. Convenient to avoid conflict with scroll behavior.
+       */
+      touchPickMaxYTremor: {
+        type: Number,
+        value: null
+      },
+      /**
+       * The class elements needs to contain to be pickable.
+       */
+      _pickableClass: {
+        type: String,
+        value: 'pickable'
+      },
+      /**
+       * The last hovered pickable element. Null when `picking` is false.
+       */
+      _lastActiveTarget: {
+        type: Object,
+        readOnly: true,
+        value: null
+      },
+      /**
+       * True when the screen is touched.
+       */
+      touching: {
+        type: Boolean,
+        value: false,
+        readOnly: true
+      }
+    },
+
+    _touchStartY: null,
+
+    _waitForTouchSelection: false,
+
+    _pickingChanged: function(newValue, oldValue) {
+      if (oldValue == undefined) {
+        return;
+      }
+      if (newValue) {
+        this.fire('pick-start', {target: this._lastActiveTarget});
+      } else {
+        this.fire('pick-end', {target: this._lastActiveTarget});
+        this._set_lastActiveTarget(null);
+      }
+    },
+
+    _pickDisabledChanged: function(pickDisabled) {
+      if (!pickDisabled) {
+        this.listen(this, 'touchstart', '_touchStartHandler');
+        this.listen(this, 'touchend', '_touchEndHandler');
+        this.listen(this, 'mouseup', '_mouseupHandler');
+        this.listen(this, 'down', '_downHandler');
+        this.listen(this, 'track', '_trackHandler');
+      }
+      else {
+        this.unlisten(this, 'touchstart', '_touchStartHandler');
+        this.unlisten(this, 'touchend', '_touchEndHandler');
+        this.unlisten(this, 'mouseup', '_mouseupHandler');
+        this.unlisten(this, 'down', '_downHandler');
+        this.unlisten(this, 'track', '_trackHandler');
+        this._setTouching(false);
+        this._setPicking(false);
+      }
+    },
+
+    _downHandler: function(e) {
+      if (this.touching && this.touchPickDelay) {
+        this._touchStartY = e.detail.y;
+        this._waitForTouchSelection = true;
+        this.listen(this, 'touchmove', '_shouldCancelTouch');
+        this.async(function(){
+          this.unlisten(this, 'touchmove', '_shouldCancelTouch');
+          if (this._waitForTouchSelection) {
+            this._waitForTouchSelection = false;
+            this._startPicking(e);
+          }
+        }, this.touchPickDelay);
+      } else {
+        this._startPicking(e);
+      }
+    },
+
+    _mouseupHandler: function() {
+      this._setPicking(false);
+    },
+
+    _shouldCancelTouch: function(e) {
+      if (this.touchPickMaxYTremor != null && Math.abs(this._touchStartY - e.touches[0].clientY) > this.touchPickMaxYTremor) {
+        this._waitForTouchSelection = false;
+      }
+    },
+
+    _startPicking: function(e) {
+      if (e.target.classList.contains(this._pickableClass)) {
+        this._set_lastActiveTarget(e.target);
+        this._setPicking(true);
+      }
+    },
+
+    _touchStartHandler: function(e) {
+      this._setTouching(true);
+    },
+
+    _touchEndHandler: function(e) {
+      if (this._waitForTouchSelection) {
+        this._startPicking(e);
+        this._waitForTouchSelection = false;
+      }
+      this._setTouching(false);
+    },
+
+    _trackHandler: function(e) {
+      if (this.picking) {
+        switch (e.detail.state) {
+          case 'track':
+            var hovered = e.detail.hover();
+            if (hovered && hovered.classList.contains(this._pickableClass) && hovered != this._lastActiveTarget) {
+              this._set_lastActiveTarget(hovered);
+            }
+          break;
+          case 'end':
+            this._setPicking(false);
+        }
+      }
+    }
+    
+  }
+
+</script>

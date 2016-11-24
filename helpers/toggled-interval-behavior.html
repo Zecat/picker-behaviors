@@ -1,0 +1,108 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<script>
+
+  /**
+   * @polymerBehavior Polymer.ToggledIntervalBehavior
+   */
+  Polymer.ToggledIntervalBehavior = {
+
+    properties: {
+      _toggledIntervalStartIndex: {
+        type: Number
+      },
+      _toggledIntervalEndIndex: {
+        type: Number
+      },
+      _absToggledIntervalStartIndex: {
+        type: Number,
+        observer: '_absToggledIntervalStartIndexChanged',
+        readOnly: true
+      },
+      _absToggledIntervalEndIndex: {
+        type: Number,
+        observer: '_absToggledIntervalEndIndexChanged',
+        readOnly: true
+      }
+    },
+
+    observers: [
+      '_toggledIntervalChanged(_toggledIntervalStartIndex, _toggledIntervalEndIndex)'
+    ],
+
+    _toggledIntervalChanged: function(_toggledIntervalStartIndex, _toggledIntervalEndIndex) {
+      this.debounce('_toggledIntervalChanged', function() {
+        if (_toggledIntervalStartIndex != null && _toggledIntervalEndIndex != null) {
+          this._set_absToggledIntervalStartIndex(Math.min(_toggledIntervalStartIndex, _toggledIntervalEndIndex));
+          this._set_absToggledIntervalEndIndex(Math.max(_toggledIntervalStartIndex, _toggledIntervalEndIndex));
+        } else {
+          this._set_absToggledIntervalStartIndex(null);
+          this._set_absToggledIntervalEndIndex(null);
+        }
+      })
+    },
+
+    _absToggledIntervalStartIndexChanged: function(newValue, oldValue) {
+      if (newValue == null || newValue === oldValue) {
+        return;
+      }
+      if (oldValue == null) {
+        if (this._absToggledIntervalEndIndex != null) {
+          oldValue = this._absToggledIntervalEndIndex;
+        } else {
+          this._toggleStateForIndex(newValue);
+          return;
+        }
+      }
+      if (newValue < oldValue) {
+        this._toggleStateForInterval(newValue, this._getPreviousIndex(oldValue));
+      } else {
+        this._toggleStateForInterval(oldValue, this._getPreviousIndex(newValue));
+      }
+      
+    },
+
+    _absToggledIntervalEndIndexChanged: function(newValue, oldValue) {
+      if (newValue == null || newValue === oldValue) {
+        return;
+      }
+      if (oldValue == null) {
+        if (this._absToggledIntervalStartIndex != null) {
+          oldValue = this._absToggledIntervalStartIndex;
+        } else {
+          this._toggleStateForIndex(newValue);
+          return;
+        }
+      }
+      if (newValue > oldValue) {
+        this._toggleStateForInterval(this._getNextIndex(oldValue), newValue);
+      } else {
+        this._toggleStateForInterval(this._getNextIndex(newValue), oldValue);
+      }
+    },
+
+    _toggleStateForIndex: function(index) {
+
+    },
+
+    _toggleStateForInterval: function(startIndex, endIndex) {
+
+    },
+
+    /**
+     * 
+     */
+    _getNextIndex: function(i) {
+      return i+1;
+    },
+
+    /**
+     *
+     */
+    _getPreviousIndex: function(i) {
+      return i-1;
+    },
+    
+  }
+
+</script>

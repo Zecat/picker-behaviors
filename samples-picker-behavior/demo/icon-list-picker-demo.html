@@ -1,0 +1,106 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <title>samples-picker-behavior demos</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html">
+  <link rel="import" href="../../../iron-ajax/iron-ajax.html">
+  <link rel="import" href="../../../paper-styles/demo-pages.html">
+  <link rel="import" href="../../../app-layout/app-drawer-layout/app-drawer-layout.html">
+  <link rel="import" href="../../../app-layout/app-drawer/app-drawer.html">
+  <link rel="import" href="../../../iron-icons/iron-icons.html">
+  <link rel="import" href="../../../paper-fab/paper-fab.html">
+  <link rel="import" href="../../../paper-icon-button/paper-icon-button.html">
+  <link rel="import" href="../../../app-layout/app-header/app-header.html">
+  <link rel="import" href="../../../app-layout/app-toolbar/app-toolbar.html">
+  <link rel="import" href="../../../app-layout/app-header-layout/app-header-layout.html">
+  <link rel="import" href="../../../app-layout/app-scroll-effects/effects/waterfall.html">
+  <link rel="import" href="./icon-list-picker/icon-list-picker.html">
+</head>
+
+<style is="custom-style">
+  icon-list-picker {
+    width: 100%;
+    height: 100%;
+  }
+  app-drawer {
+    z-index: 2;
+    text-align: left;
+    --app-drawer-content-container: {
+      color: white;
+      background: var(--paper-purple-500);
+      @apply(--layout-scroll);
+    };
+  }
+  #stared-icons {
+    padding: 24px;
+    @apply(--layout-center-justified);
+    @apply(--layout-wrap);
+  }
+  .flex {
+    @apply(--layout-flex);
+  }
+  .stared-icon {
+    padding: 7px;
+  }
+  paper-fab {
+    right: 36px;
+    bottom: 36px;
+    position: fixed;
+    z-index: 1;
+  }
+  app-toolbar {
+    background: rgba(250, 250, 250, 0.95);
+  }
+  #selectedTitle {
+    font-size: 22px;
+    padding-left: 24px;
+    line-height: 64px;
+    vertical-align: middle;
+    background: var(--paper-purple-400);
+  }
+</style>
+
+<body unresolved>
+  <template is="dom-bind">
+    <iron-ajax auto url="./icons.json" last-response="{{icons}}"></iron-ajax>
+    <app-drawer-layout fullbleed>
+      <app-drawer align="end">
+        <div id="selectedTitle">Selected icons</div>
+        <div id="stared-icons">
+          <template is="dom-repeat" items="[[selectedIcons]]">
+            <iron-icon class="stared-icon" icon="[[item.icon]]"></iron-icon>
+          </template>
+        </div>
+      </app-drawer>
+      <app-header-layout has-scroll-region>
+        <app-header condenses fixed effects="waterfall">
+          <app-toolbar>
+            <a href="./index.html"><paper-icon-button icon="arrow-back"></paper-icon-button></a>
+            <span spacer>Select your icons</span>
+            <div class="flex"></div>
+          </app-toolbar>
+        </app-header>
+      <paper-fab icon="stars" drawer-toggle></paper-fab>
+      <icon-list-picker icons="[[icons]]" selected-icons="{{selectedIcons}}"></icon-list-picker>
+      </app-header-layout>
+    </app-drawer-layout>
+  </template>
+
+</body>
+</html>
