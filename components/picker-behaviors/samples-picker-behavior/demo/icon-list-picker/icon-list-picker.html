@@ -1,0 +1,145 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+<link rel="import" href="../../../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../iron-icon/iron-icon.html">
+<link rel="import" href="../../../../iron-icons/iron-icons.html">
+<link rel="import" href="../../../../iron-list/iron-list.html">
+<link rel="import" href="../../samples-picker-behavior.html">
+
+<dom-module id="icon-list-picker">
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+        @apply(--layout);
+        @apply(--layout-wrap);
+        user-select: none;
+        position: relative;
+      }
+      #header {
+        width: 100%;
+        height: auto;
+        background: white;
+      }
+      .pickable {
+        width: 120px;
+        height: 120px;
+        color: var(--paper-grey-700);
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+        @apply(--layout-center-justified);
+        cursor: pointer;
+        transition: color 0.1s;
+      }
+      .icon {
+        width: 60px;
+        height: 60px;
+        transition: background-color 0.1s, color 0.1s;
+      }
+      .icon-title {
+        text-align: center;
+        font-size: 12px;
+        padding: 12px;
+        pointer-events: none;
+        color: var(--paper-grey-600);
+      }
+      .selecting {
+        color: var(--paper-red-500);
+      }
+      .selected:not(.selecting) {
+        color: var(--paper-blue-500);
+      }
+      .preselected {
+        color: var(--paper-green-500);
+      }
+      #closeBtn {
+        right: 24px;
+        position: absolute;
+      }
+      iron-icon {
+        pointer-events: none;
+      }
+      #iconList {
+        height: 100%;
+        width: 100%;
+        padding: 50px 0;
+        box-sizing: border-box;
+      }
+      @media (min-width: 900px) {
+        #iconList {
+          padding: 50px;
+        }
+      }
+    </style>
+    <iron-list id="iconList" items="[[icons]]" grid selected-items="{{selectedIcons}}" multi-selection>
+      <template>
+        <div class$="pickable {{_getSelectedClass(selected)}} {{_getPreselectedClass(item.preselected)}} {{_getSelectingClass(item.selecting)}}" data-index$="[[index]]">
+          <iron-icon class="icon" icon="[[item.icon]]"></iron-icon>
+          <div class="icon-title">[[item.icon]]</div>
+        </div>
+      </template>
+    </iron-list>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'icon-list-picker',
+
+      properties: {
+        selectedIcons: {
+          type: Object,
+          notify: true
+        },
+        icons: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        }
+      },
+
+      behaviors: [
+        Polymer.SamplesPickerBehavior
+      ],
+
+      attached: function() {
+        this.async(function() {
+          this.$.iconList.notifyResize();
+        }.bind(this), 100);
+      },
+
+      _getPreselectedClass: function(preselected) {
+        if (preselected) {
+          return 'preselected';
+        }
+      },
+
+      _getSelectingClass: function(selecting) {
+        if (selecting) {
+          return 'selecting';
+        }
+      },
+
+      _getSelectedClass: function(selected) {
+        if (selected) {
+          return 'selected';
+        }
+      },
+
+      _toggleImmediateSelectionForIndex: function(index) {
+        this.set('icons.'+index+'.preselected', !this.icons[index].preselected);
+        this.set('icons.'+index+'.selecting', !this.icons[index].selecting);
+      },
+
+      _confirmSelectionForIndex: function(index) {console.log(index);
+        this.$.iconList.toggleSelectionForItem(index);
+        this.set('icons.'+index+'.selecting', false);
+      },
+
+      _getIndexFromTarget: function(target) {
+        return target.getAttribute('data-index');
+      }
+  });
+  </script>
+</dom-module>

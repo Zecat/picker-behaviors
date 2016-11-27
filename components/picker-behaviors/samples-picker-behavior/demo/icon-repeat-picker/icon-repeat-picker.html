@@ -1,0 +1,107 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+<link rel="import" href="../../../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../iron-icon/iron-icon.html">
+<link rel="import" href="../../../../iron-icons/iron-icons.html">
+<link rel="import" href="../../samples-picker-behavior.html">
+
+<dom-module id="icon-repeat-picker">
+  <template>
+    <style>
+      :host {
+        display: block;
+        @apply(--layout);
+        @apply(--layout-wrap);
+        user-select: none;
+      }
+      #header {
+        width: 100%;
+        height: auto;
+        background: white;
+      }
+      .pickable {
+        width: 50px;
+        height: 50px;
+        color: var(--paper-grey-700);
+        margin: 5px;
+        cursor: pointer;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 50px;
+        font-size: 16px;
+        transition: background-color 0.1s, color 0.1s;
+      }
+      .selected {
+        background: var(--paper-grey-100);
+        color: var(--paper-green-500);
+      }
+      .selecting {
+        color: var(--paper-blue-500);
+      }
+      #closeBtn {
+        right: 24px;
+        position: absolute;
+      }
+      iron-icon {
+        pointer-events: none;
+      }
+    </style>
+
+    <template id="domRepeat" is="dom-repeat" items="[[icons]]">
+      <div id="icon[[index]]" class$="pickable {{_getSelectedClass(item.selected)}} {{_getSelectingClass(item.selecting)}}">
+        <iron-icon icon="[[item.icon]]"></iron-icon>
+      </div>
+    </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'icon-repeat-picker',
+
+      properties: {
+        selectedIcons: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        icons: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        }
+      },
+
+      behaviors: [
+        Polymer.SamplesPickerBehavior
+      ],
+
+      _getSelectedClass: function(selected) {
+        if (selected) {
+          return 'selected';
+        }
+      },
+
+      _getSelectingClass: function(selecting) {
+        if (selecting) {
+          return 'selecting';
+        }
+      },
+
+      _toggleImmediateSelectionForIndex: function(index) {
+        this.set('icons.'+index+'.selected', !this.icons[index].selected);
+        this.set('icons.'+index+'.selecting', !this.icons[index].selecting);
+      },
+
+      _confirmSelectionForIndex: function(index) {
+        this.set('icons.'+index+'.selecting', false);
+      },
+
+      _getIndexFromTarget: function(target) {
+        return this.$.domRepeat.indexForElement(target);
+      },
+
+  });
+  </script>
+</dom-module>

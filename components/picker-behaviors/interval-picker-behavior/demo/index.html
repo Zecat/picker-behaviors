@@ -1,0 +1,51 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <title>interval-picker-behavior demos</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../../paper-styles/demo-pages.html">
+  <link rel="import" href="../../../paper-styles/shadow.html">
+  <link rel="import" href="../../../paper-styles/typography.html">
+  <link rel="import" href="../../../iron-ajax/iron-ajax.html">
+  <link rel="import" href="./thumbnail-interval-picker/thumbnail-interval-picker.html">
+</head>
+<style is="custom-style">
+  #wrapper {
+    width: 90%;
+    margin: auto;
+  }
+  thumbnail-interval-picker {
+    @apply(--shadow-elevation-8dp);
+    width: 100%;
+  }
+  h4 {
+    @apply(--paper-font-title);
+    margin: 48px;
+  }
+</style>
+<body unresolved>
+    <div id="wrapper">
+    <template is="dom-bind">
+      <iron-ajax auto url="./thumbnail-interval-picker/thumbnails.json" last-response="{{thumbnails}}"></iron-ajax>
+      <h4>thumbnail-interval-picker is an implementation of IntervalPickerBehavior.</h4>
+        <thumbnail-interval-picker thumbnails="[[thumbnails]]">
+        </thumbnail-interval-picker>
+    </template>
+    </div>
+</body>
+</html>

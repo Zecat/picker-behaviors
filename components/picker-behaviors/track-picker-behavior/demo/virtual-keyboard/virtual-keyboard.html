@@ -1,0 +1,98 @@
+<link rel="import" href="../../../../polymer/polymer.html">
+<link rel="import" href="../../../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../paper-input/paper-textarea.html">
+<link rel="import" href="../../track-picker-behavior.html">
+
+<dom-module id="virtual-keyboard">
+  <template>
+    <style>
+      :host {
+        display: block;
+        @apply(--layout);
+        @apply(--layout-wrap);
+        user-select: none;
+      }
+      paper-textarea {
+        width: 100%;
+      }
+      #header {
+        width: 100%;
+        height: auto;
+        background: white;
+      }
+      .pickable {
+        width: 50px;
+        height: 50px;
+        background: var(--paper-blue-500);
+        color: white;
+        margin: 5px;
+        cursor: pointer;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 50px;
+        font-size: 16px;
+      }
+      .picked {
+        background: var(--paper-blue-700);
+      }
+      #closeBtn {
+        right: 24px;
+        position: absolute;
+      }
+    </style>
+    
+    <div id="header">
+      <paper-textarea rows="3" label="Type your text" value="{{text}}"></paper-textarea>
+    </div>
+
+    <template is="dom-repeat" items="[[alphabet]]">
+      <div class="pickable">[[item]]</div>
+    </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'virtual-keyboard',
+
+      properties: {
+        _lastActiveTarget: {
+          observer: '_lastActiveTargetChanged',
+          readOnly: true
+        },
+        text: {
+          type: String,
+          value: ''
+        },
+        alphabet: {
+          type: Array,
+          value: function() {
+            return ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'N', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '-', '`', '´'];
+          }
+        }
+      },
+
+      behaviors: [
+        Polymer.TrackPickerBehavior
+      ],
+
+      listeners: {
+        'pick-end': '_pickEndHandler'
+      },
+
+      _pickEndHandler: function(e) {
+        this.text += e.detail.target.innerText;
+      },
+
+      _lastActiveTargetChanged: function(newValue, oldValue) {
+        this.toggleClass('picked', true, newValue);
+        this.toggleClass('picked', false, oldValue);
+      },
+
+      _eraseText: function() {
+        this.text = '';
+      }
+
+  });
+  </script>
+</dom-module>
